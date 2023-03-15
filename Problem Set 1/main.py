@@ -44,9 +44,23 @@ def getColumnFromGeneratorMatrix(columnNumber):
     return column
 
 def tryToRepairThat():
+    if tmparr == [0, 0, 0, 0, 0, 0, 0, 0]:
+        return
+
     for i in range(16):
-        if(tmparr == getColumnFromGeneratorMatrix(i)):
-            print("ERROR ON POSITION: ", i)
+        if (tmparr == getColumnFromGeneratorMatrix(i)):
+            print("BLAD NA POZYCJI: ", i)
+            return
+    for i in range(16):
+        for j in range(15):
+            tmp = []
+            columnA = getColumnFromGeneratorMatrix(i)
+            columnB = getColumnFromGeneratorMatrix(j)
+            for k in range(8):
+                tmp.append((columnA[k] + columnB[k]) % 2)
+            if tmp == tmparr:
+                print("BLEDY NA POZYCJACH: ", i, "oraz ", j)
+                return
 
 
 def bits_to_char(bits):
@@ -61,9 +75,10 @@ def char_to_bits(char):
 
 codeword = codeMessage(char_to_bits('a'))
 print("codeword:", codeword)
-codeword = [0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1]
+codeword = [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1]
 decodeMessage(codeword)
 print("column to repair: ", tmparr)
 tryToRepairThat()
+
 
 
