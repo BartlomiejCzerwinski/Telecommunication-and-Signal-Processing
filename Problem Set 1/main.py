@@ -1,16 +1,16 @@
 import numpy as np
 tmparr = []
+generator_matrix = [[1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                    [1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
+                    [1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0],
+                    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+                    [1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                    [0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+                    [1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                    [0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1]]
 def codeMessage(m):
     message = np.array(m)
     print("oryginal message:", message)
-    generator_matrix = [[1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-                        [1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
-                        [1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0],
-                        [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0],
-                        [1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-                        [0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-                        [1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-                        [0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1]]
     finalAdd = []
     for y in range(8):
         tmp = 0;
@@ -29,15 +29,6 @@ def codeMessage(m):
 
 
 def decodeMessage(codeword):
-    generator_matrix = [[1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-                        [1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
-                        [1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0],
-                        [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0],
-                        [1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-                        [0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-                        [1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-                        [0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1]]
-
     for y in range(8):
         tmp = 0;
         for x in range(8):
@@ -47,6 +38,16 @@ def decodeMessage(codeword):
             tmparr.append(1)
         else:
             tmparr.append(0)
+
+def getColumnFromGeneratorMatrix(columnNumber):
+    column = [row[columnNumber] for row in generator_matrix]
+    return column
+
+def tryToRepairThat():
+    for i in range(16):
+        if(tmparr == getColumnFromGeneratorMatrix(i)):
+            print("ERROR ON POSITION: ", i)
+
 
 def bits_to_char(bits):
     bits_str = ''.join([str(bit) for bit in bits])
@@ -60,8 +61,9 @@ def char_to_bits(char):
 
 codeword = codeMessage(char_to_bits('a'))
 print("codeword:", codeword)
-codeword = [0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1]
+codeword = [0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1]
 decodeMessage(codeword)
 print("column to repair: ", tmparr)
+tryToRepairThat()
 
 
