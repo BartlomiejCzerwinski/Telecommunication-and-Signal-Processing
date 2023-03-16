@@ -1,4 +1,5 @@
 import numpy as np
+
 generator_matrix = [[1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
                     [1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
                     [1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0],
@@ -10,46 +11,26 @@ generator_matrix = [[1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
 def codeMessage(message):
     codeword = ""
     for character in message:
-        character = char_to_bits(character)
-        m = np.array(character)
-        finalAdd = []
+        characterAsBits = char_to_bits(character)
+        characterAsBits = np.array(characterAsBits)
+        bitsToAdd = []
         for y in range(8):
-            tmp = 0;
+            tmp = 0
             for x in range(8):
-                if generator_matrix[y][x] == 1 and m[x] == 1:
+                if generator_matrix[y][x] == 1 and characterAsBits[x] == 1:
                     tmp += 1
             if tmp%2 != 0:
-                finalAdd.append(1)
+                bitsToAdd.append(1)
             else:
-                finalAdd.append(0)
+                bitsToAdd.append(0)
 
-        finalAdd = np.array(finalAdd)
-        codeword = codeword + numpyArrayToString(np.concatenate([m, finalAdd]))
+        bitsToAdd = np.array(bitsToAdd)
+        codeword = codeword + numpyArrayToString(np.concatenate([characterAsBits, bitsToAdd]))
     return codeword
-
-def numpyArrayToString(npArray):
-    result = ""
-    for i in npArray:
-        if i == 1:
-            result += "1"
-        else:
-            result +="0"
-    return result
-
-def stringToNumpyArray(stringToConvert):
-    tmp = []
-    for i in stringToConvert:
-        if i == "1":
-            tmp.append(1)
-        else:
-            tmp.append(0)
-    return np.array(tmp)
-
-
 
 def decodeMessage(codeword):
     tmpStr = ""
-    res = ""
+    result = ""
     for c in codeword:
         tmpStr += c
         if len(tmpStr) == 16:
@@ -66,23 +47,20 @@ def decodeMessage(codeword):
                     tmparr.append(0)
             afterErrorsRepair = correctErrors(tmparr, codewordArray)
             afterErrorsRepair = numpyArrayToString(afterErrorsRepair)
-            res += bits_to_char(cutOffParityBits(afterErrorsRepair))
+            result += bits_to_char(cutOffParityBits(afterErrorsRepair))
             tmpStr = ""
-    return res
-
-def getColumnFromGeneratorMatrix(columnNumber):
-    column = [row[columnNumber] for row in generator_matrix]
-    return column
+    return result
 
 def correctErrors(errorsArray, codeword):
     if errorsArray == [0, 0, 0, 0, 0, 0, 0, 0]:
         return codeword
 
-    for i in range(16):
+    for i in range(16):                                         #try to correct one bit error
         if (errorsArray == getColumnFromGeneratorMatrix(i)):
             codeword[i] = switchBit(codeword[i])
             return codeword
-    for i in range(16):
+
+    for i in range(16):                                         #try to correct two bits error
         for j in range(15):
             tmp = []
             columnA = getColumnFromGeneratorMatrix(i)
@@ -93,6 +71,28 @@ def correctErrors(errorsArray, codeword):
                 codeword[i] = switchBit(codeword[i])
                 codeword[j] = switchBit(codeword[j])
                 return codeword
+
+def stringToNumpyArray(stringToConvert):
+    tmp = []
+    for i in stringToConvert:
+        if i == "1":
+            tmp.append(1)
+        else:
+            tmp.append(0)
+    return np.array(tmp)
+
+def numpyArrayToString(npArray):
+    result = ""
+    for i in npArray:
+        if i == 1:
+            result += "1"
+        else:
+            result +="0"
+    return result
+
+def getColumnFromGeneratorMatrix(columnNumber):
+    column = [row[columnNumber] for row in generator_matrix]
+    return column
 
 def switchBit(bitToSwitch):
     if bitToSwitch == 1:
@@ -126,12 +126,8 @@ def saveFile(filename, data):
     file.close()
 
 
-codeword = codeMessage('To jest przykladowy tekst')
-saveFile("firstSave.txt", codeword)
+#codeword = codeMessage("ok")
+#saveFile("firstSave.txt", codeword)
 
 x = loadFile("firstSave.txt")
 print(decodeMessage(x))
-
-
-
-
