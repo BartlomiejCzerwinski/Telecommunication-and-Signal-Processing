@@ -126,8 +126,24 @@ def saveFile(filename, data):
     file.close()
 
 
-#codeword = codeMessage("ok")
-#saveFile("firstSave.txt", codeword)
-
-x = loadFile("firstSave.txt")
-print(decodeMessage(x))
+while(1):
+    print("Co chcesz zrobic?")
+    print("1. Zakodowac wiadomosc")
+    print("2. Odkodowac wiadomosc")
+    print("3. Wyjscie z programu")
+    choice = input("Wybor: ")
+    if choice == "1":
+        fileWithMessageToCode = input("Podaj nazwe pliku z wiadomoscia do zakodowania: ")
+        fileToSaveCodeword = input("Podaj nazwe pliku do zapisania zakodowanej wiadomosci: ")
+        codeword = codeMessage(loadFile(fileWithMessageToCode))
+        saveFile(fileToSaveCodeword, codeword)
+        print("Zakodowano wiadomosc")
+    elif choice == "2":
+        fileWithCodedMessage = input("Podaj nazwe pliku z wiadomoscia do odkodowania: ")
+        print("Odkodowana wiadomosc:")
+        codedMessage = loadFile(fileWithCodedMessage)
+        print(decodeMessage(codedMessage))
+    elif choice == "3":
+        exit()
+    else:
+        print("Nie ma takiej opcji!")
