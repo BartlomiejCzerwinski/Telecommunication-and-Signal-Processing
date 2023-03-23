@@ -37,7 +37,7 @@ def decodeMessage(codeword):
             tmparr = []
             codewordArray = stringToNumpyArray(tmpStr)
             for y in range(8):
-                tmp = 0;
+                tmp = 0
                 for x in range(8):
                     tmp += (codewordArray[x] * generator_matrix[y][x])
                 tmp += codewordArray[8 + y]
@@ -81,6 +81,33 @@ def stringToNumpyArray(stringToConvert):
             tmp.append(0)
     return np.array(tmp)
 
+def codewordToAsciiChars(codeword):
+    arr = stringToNumpyArray(codeword)
+    i = 0
+    result = ""
+    tmp = []
+    for a in arr:
+        tmp.append(a)
+        i += 1
+        if i == 8:  #8, nie 7
+            print(tmp)
+            result += bits_to_char2(tmp)
+            tmp = []
+            i = 0
+    print(result)
+    return result
+
+def asciiCharsToCodeword(asciiChars):
+    result = ""
+    for c in asciiChars:
+        result += numpyArrayToString(np.array(char_to_bits(c)))
+    return result
+
+def bits_to_char2(bits):
+    bits_str = ''.join([str(bit) for bit in bits])
+    char = chr(int(bits_str, 2))
+    return char
+
 def numpyArrayToString(npArray):
     result = ""
     for i in npArray:
@@ -121,10 +148,10 @@ def loadFile(filename):
     return result
 
 def saveFile(filename, data):
-    file = open(filename, 'w')
+    file = open(filename, 'w', encoding="utf-8")
+    print(data.__class__)
     file.write(data)
     file.close()
-
 
 while(1):
     print("Co chcesz zrobic?")
@@ -136,14 +163,18 @@ while(1):
         fileWithMessageToCode = input("Podaj nazwe pliku z wiadomoscia do zakodowania: ")
         fileToSaveCodeword = input("Podaj nazwe pliku do zapisania zakodowanej wiadomosci: ")
         codeword = codeMessage(loadFile(fileWithMessageToCode))
+        codeword = codewordToAsciiChars(codeword)
+        print(codeword.__class__)
         saveFile(fileToSaveCodeword, codeword)
         print("Zakodowano wiadomosc")
     elif choice == "2":
         fileWithCodedMessage = input("Podaj nazwe pliku z wiadomoscia do odkodowania: ")
         print("Odkodowana wiadomosc:")
         codedMessage = loadFile(fileWithCodedMessage)
-        print(decodeMessage(codedMessage))
+        print(asciiCharsToCodeword(codedMessage))
+        print(decodeMessage(asciiCharsToCodeword(codedMessage)))
     elif choice == "3":
         exit()
     else:
         print("Nie ma takiej opcji!")
+
