@@ -148,7 +148,7 @@ def loadFile(filename):
     return result
 
 def saveFile(filename, data):
-    file = open(filename, 'w', encoding="utf-8")
+    file = open(filename, 'w', encoding="ISO-8859-1")
     print(data.__class__)
     file.write(data)
     file.close()
