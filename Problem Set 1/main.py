@@ -89,12 +89,10 @@ def codewordToAsciiChars(codeword):
     for a in arr:
         tmp.append(a)
         i += 1
-        if i == 8:  #8, nie 7
-            print(tmp)
+        if i == 8:
             result += bits_to_char2(tmp)
             tmp = []
             i = 0
-    print(result)
     return result
 
 def asciiCharsToCodeword(asciiChars):
@@ -142,14 +140,13 @@ def cutOffParityBits(bitsToCutOff):
     return bitsToCutOff[:8]
 
 def loadFile(filename):
-    file = open(filename, 'r')
+    file = open(filename, 'r', encoding="ISO-8859-1")
     result = file.read()
     file.close()
     return result
 
 def saveFile(filename, data):
     file = open(filename, 'w', encoding="ISO-8859-1")
-    print(data.__class__)
     file.write(data)
     file.close()
 
@@ -164,17 +161,14 @@ while(1):
         fileToSaveCodeword = input("Podaj nazwe pliku do zapisania zakodowanej wiadomosci: ")
         codeword = codeMessage(loadFile(fileWithMessageToCode))
         codeword = codewordToAsciiChars(codeword)
-        print(codeword.__class__)
         saveFile(fileToSaveCodeword, codeword)
         print("Zakodowano wiadomosc")
     elif choice == "2":
         fileWithCodedMessage = input("Podaj nazwe pliku z wiadomoscia do odkodowania: ")
         print("Odkodowana wiadomosc:")
         codedMessage = loadFile(fileWithCodedMessage)
-        print(asciiCharsToCodeword(codedMessage))
         print(decodeMessage(asciiCharsToCodeword(codedMessage)))
     elif choice == "3":
         exit()
     else:
         print("Nie ma takiej opcji!")
-
