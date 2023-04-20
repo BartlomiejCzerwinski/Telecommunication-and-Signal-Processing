@@ -9,13 +9,16 @@ def send_huffman_dict(huffman_dict, host, port):
         json_dict = json.dumps(huffman_dict)
         s.sendall(json_dict.encode())
 def huffman_encoding(data):
+    # zliczanie występowania każdego znaku w wiadomośći
     freq = defaultdict(int)
     for char in data:
         freq[char] += 1
 
+    # tworzenie zbioru z każdym znakiem i jego częstością występowania
     heap = [[weight, [symbol, ""]] for symbol, weight in freq.items()]
     heapq.heapify(heap)
 
+    # łączenie węzłów drzewa huffmana i tworzenie kodów dla znaków
     while len(heap) > 1:
         left = heapq.heappop(heap)
         right = heapq.heappop(heap)
@@ -47,22 +50,21 @@ def huffman_decoding(encoded_message, huffman_dict):
     return decoded_message
 
 
-def receive_huffman_encoded_message(port, huffman_dict):
+def receive_huffman_encoded_message(address, port, huffman_dict):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(('192.168.77.11', port))
+        s.bind((address, port))
         s.listen()
         conn, addr = s.accept()
         with conn:
-            print('Połączenie nawiązane przez', addr)
             data = conn.recv(1024)
             if data:
                 encoded_message = json.loads(data.decode())
                 decoded_message = huffman_decoding(encoded_message, huffman_dict)
                 return decoded_message
 
-def receive_huffman_dict(port):
+def receive_huffman_dict(address, port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(('192.168.77.11', port))
+        s.bind((address, port))
         s.listen()
         print("1")
         conn, addr = s.accept()
@@ -80,23 +82,47 @@ print("1.Wyslij")
 print("2.Odbieraj")
 x = input("Wybor:")
 if x == '1':
-    text = "Wszystko działa elo beng beng!"
-    # kodowanie Huffmana
+
+    # odczytanie wiadomości z pliku
+    filename = input("Podaj nazwe pliku tekstowego: ")
+    try:
+        with open(filename, "r") as file:
+            text = file.read()
+            file.close()
+    except FileNotFoundError:
+        print("Plik nie istnieje")
+
+    # tworzenie słownika i kodowanie wiadomości
     huffman_dict = huffman_encoding(text)
     encoded_message = "".join(huffman_dict[char] for char in text)
+
     # wysłanie zakodowanej wiadomości
     host = "192.168.77.11"
     port = 16500
-    send_huffman_encoded_message(json.dumps(encoded_message), host, port)
     send_huffman_dict(huffman_dict, host, port)
+    send_huffman_encoded_message(json.dumps(encoded_message), host, port)
     print("wyslano pomyslnie:", encoded_message)
     print("huffman_dict:", huffman_dict)
 if x == '2':
+
     # adres i port do nasłuchiwania
+    address = '192.168.77.11'
     port = 16500
 
-    huffman_dict = receive_huffman_dict(port)
-    print("huffman_dict:", huffman_dict)
-    # nasłuchiwanie i odbieranie zakodowanej wiadomości
-    decoded_message = receive_huffman_encoded_message(port, huffman_dict)
-    print(decoded_message)
+
+    # odbieranie słownika huffmana
+    huffman_dict = receive_huffman_dict(address, port)
+    print("Odebrany słownik: ", huffman_dict)
+
+    # odbieranie zakodowanej wiadomości
+    decoded_message = receive_huffman_encoded_message(address, port, huffman_dict)
+    print("Odebrana wiadomość: ", decoded_message)
+
+    # zapisanie wiadomości na dysku
+    try:
+        with open(filename, "w") as file:
+            file.write(text)
+            file.close()
+            print("Zapisano plik pod nazwą: ", filename)
+    except FileNotFoundError:
+        print("Nie podano nazwy")
