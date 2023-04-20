@@ -130,6 +130,7 @@ if x == '2':
     except FileNotFoundError:
         print("Nie podano nazwy")
 '''
+
 def receiveMessageWindow():
     # utworzenie nowego okna
     new_window = tk.Toplevel(root)
@@ -140,13 +141,66 @@ def receiveMessageWindow():
     text_box_label.pack(pady=5)
 
     #pole tekstowe
-    text_var1 = tk.StringVar()
     text_box = tk.Entry(new_window, textvariable=text_var1, font=("Arial", 8))
     text_box.pack(pady=5)
 
     # przycisk w nowym oknie
     new_button = tk.Button(new_window, text="Zapisz odebrany plik", font=("Arial", 8) ,command=receiveMessage)
     new_button.pack(pady=5)
+
+def sendMessageWindow():
+    # utworzenie nowego okna
+    new_window = tk.Toplevel(root)
+    new_window.geometry("300x100")
+
+    # naglowek tekstu
+    text_box_label = tk.Label(new_window, text="Podaj nazwe pliku:", font=("Aerial", 8))
+    text_box_label.pack(pady=5)
+
+    # pole tekstowe
+    text_box = tk.Entry(new_window, textvariable=text_var2, font=("Arial", 8))
+    text_box.pack(pady=5)
+
+    # przycisk w nowym oknie
+    new_button = tk.Button(new_window, text="Wyślij plik", font=("Arial", 8), command=sendMessage)
+    new_button.pack(pady=5)
+
+root = tk.Tk()
+root.geometry("300x100")
+
+text_var1 = tk.StringVar()
+text_var2 = tk.StringVar()
+
+send_button = tk.Button(root, text="Wysyłaj",font=("Arial", 8), command=sendMessageWindow)
+send_button.pack()
+
+receive_button = tk.Button(root, text="Odbieraj",font=("Arial", 8), command=receiveMessageWindow)
+receive_button.pack()
+
+def sendMessage():
+
+    # odczytanie wiadomości z pliku
+    filename = text_var2.get()
+    print(text_var2.get())
+    try:
+        with open(filename, "r") as file:
+            text = file.read()
+            file.close()
+    except FileNotFoundError:
+        print("Plik nie istnieje")
+
+    # tworzenie słownika i kodowanie wiadomości
+    huffman_dict = huffman_encoding(text)
+    encoded_message = "".join(huffman_dict[char] for char in text)
+
+    # wysłanie zakodowanej wiadomości
+    host = "10.77.14.30"
+    port = 16500
+    send_huffman_dict(huffman_dict, host, port)
+    send_huffman_encoded_message(json.dumps(encoded_message), host, port)
+    print("wyslano pomyslnie:", encoded_message)
+    print("huffman_dict:", huffman_dict)
+    messagebox.showinfo("Wysłano wiadomość")
 
 def receiveMessage():
     # adres i port do nasłuchiwania
@@ -171,58 +225,5 @@ def receiveMessage():
     except FileNotFoundError:
         print("Nie podano nazwy")
     messagebox.showinfo("Odebrano wiadomość")
-def sendMessageWindow():
-    # utworzenie nowego okna
-    new_window = tk.Toplevel(root)
-    new_window.geometry("300x100")
-
-    # naglowek tekstu
-    text_box_label = tk.Label(new_window, text="Podaj nazwe pliku:", font=("Aerial", 8))
-    text_box_label.pack(pady=5)
-
-    # pole tekstowe
-    text_var2 = tk.StringVar()
-    text_box = tk.Entry(new_window, textvariable=text_var2, font=("Arial", 8))
-    text_box.pack(pady=5)
-
-    # przycisk w nowym oknie
-    new_button = tk.Button(new_window, text="Wyślij plik", font=("Arial", 8), command=sendMessage)
-    new_button.pack(pady=5)
-
-def sendMessage():
-
-    # odczytanie wiadomości z pliku
-    filename = text_var2.get()
-    try:
-        with open(filename, "r") as file:
-            text = file.read()
-            file.close()
-    except FileNotFoundError:
-        print("Plik nie istnieje")
-
-    # tworzenie słownika i kodowanie wiadomości
-    huffman_dict = huffman_encoding(text)
-    encoded_message = "".join(huffman_dict[char] for char in text)
-
-    # wysłanie zakodowanej wiadomości
-    host = "10.77.14.30"
-    port = 16500
-    send_huffman_dict(huffman_dict, host, port)
-    send_huffman_encoded_message(json.dumps(encoded_message), host, port)
-    print("wyslano pomyslnie:", encoded_message)
-    print("huffman_dict:", huffman_dict)
-    messagebox.showinfo("Wysłano wiadomość")
-
-root = tk.Tk()
-root.geometry("300x100")
-
-text_var1 = ""
-text_var2 = ""
-
-send_button = tk.Button(root, text="Wysyłaj",font=("Arial", 8), command=sendMessageWindow)
-send_button.pack()
-
-receive_button = tk.Button(root, text="Odbieraj",font=("Arial", 8), command=receiveMessageWindow)
-receive_button.pack()
 
 root.mainloop()
