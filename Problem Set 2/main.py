@@ -3,7 +3,11 @@ from collections import defaultdict
 import socket
 import json
 
-
+def send_huffman_dict(huffman_dict, host, port):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((host, port))
+        json_dict = json.dumps(huffman_dict)
+        s.sendall(json_dict.encode())
 def huffman_encoding(data):
     freq = defaultdict(int)
     for char in data:
@@ -56,6 +60,20 @@ def receive_huffman_encoded_message(port, huffman_dict):
                 encoded_message = json.loads(data.decode())
                 decoded_message = huffman_decoding(encoded_message, huffman_dict)
                 print("Odebrana wiadomość:", decoded_message)
+                return decoded_message
+
+def receive_huffman_dict(port):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(('localhost', port))
+        s.listen()
+        conn, addr = s.accept()
+        with conn:
+            print('Connected by', addr)
+            data = conn.recv(1024)
+            if data:
+                json_dict = data.decode()
+                huffman_dict = json.loads(json_dict)
+                return huffman_dict
 
 print("1.Wyslij")
 print("2.Odbieraj")
@@ -67,15 +85,17 @@ if x == '1':
     print(huffman_dict)
     encoded_message = "".join(huffman_dict[char] for char in text)
     # wysłanie zakodowanej wiadomości
-    host = "127.0.0.1"
-    port = 4000
+    host = "192.168.77.11"
+    port = 16500
     send_huffman_encoded_message(json.dumps(encoded_message), host, port)
+    send_huffman_dict(huffman_dict, host, port)
     print("wyslano pomyslnie:", encoded_message)
+    print("huffman_dict:", huffman_dict)
 if x == '2':
     # adres i port do nasłuchiwania
     port = 4000
 
-    huffman_dict = {' ': '010', 'e': '000', 'a': '0110', 'b': '0111', 'g': '1001', 'n': '1011', 'o': '1100', 's': '1101', 'z': '1111', 'ł': '0010', '!': '00110', 'W': '00111', 'd': '10000', 'i': '10001', 'k': '10100', 'l': '10101', 't': '11100', 'y': '11101'}
+    huffman_dict = receive_huffman_dict(port)
 
     # nasłuchiwanie i odbieranie zakodowanej wiadomości
     receive_huffman_encoded_message(port, huffman_dict)

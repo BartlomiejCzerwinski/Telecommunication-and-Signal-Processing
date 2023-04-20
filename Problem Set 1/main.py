@@ -132,6 +132,7 @@ def bits_to_char(bits):
     return char
 
 def char_to_bits(char):
+    char = chr(char)
     binary_string = bin(ord(char))[2:].zfill(8)
     bits = [int(bit) for bit in binary_string]
     return bits
@@ -140,13 +141,13 @@ def cutOffParityBits(bitsToCutOff):
     return bitsToCutOff[:8]
 
 def loadFile(filename):
-    file = open(filename, 'r', encoding="ISO-8859-1")
+    file = open(filename, 'rb')
     result = file.read()
     file.close()
     return result
 
 def saveFile(filename, data):
-    file = open(filename, 'w', encoding="ISO-8859-1")
+    file = open(filename, 'wb')
     file.write(data)
     file.close()
 
