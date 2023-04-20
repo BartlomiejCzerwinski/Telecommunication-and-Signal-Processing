@@ -96,8 +96,8 @@ def receiveMessageWindow():
     try:
         with open("słownik", "w") as file:
             file.write(json.dumps(abc))
-            file.close
-     except FileNotFoundError:
+            file.close()
+    except FileNotFoundError:
          print("a")
 
     # odbieranie zakodowanej wiadomości
