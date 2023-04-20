@@ -62,6 +62,12 @@ def receive_huffman_encoded_message(address, port, huffman_dict):
             data = conn.recv(1024)
             if data:
                 encoded_message = json.loads(data.decode())
+                try:
+                    with open("zakodowane.txt", "w") as file:
+                        file.write(encoded_message)
+                        file.close()
+                except FileNotFoundError:
+                    print("a")
                 decoded_message = huffman_decoding(encoded_message, huffman_dict)
                 return decoded_message
 
@@ -71,7 +77,6 @@ def receive_huffman_dict(address, port):
         s.listen()
         conn, addr = s.accept()
         with conn:
-            print('Connected by', addr)
             data = conn.recv(1024)
             if data:
                 json_dict = data.decode()
@@ -82,16 +87,22 @@ decoded_message = ''
 def receiveMessageWindow():
     global decoded_message
     # adres i port do nasłuchiwania
-    address = '10.77.14.30'
-    port = 16500
+    address = '192.168.141.125'
+    port = 16049
 
     # odbieranie słownika huffmana
     huffman_dict = receive_huffman_dict(address, port)
-    print("Odebrany słownik: ", huffman_dict)
+    abc = huffman_dict
+    try:
+        with open("słownik", "w") as file:
+            file.write(json.dumps(abc))
+            file.close
+     except FileNotFoundError:
+         print("a")
 
     # odbieranie zakodowanej wiadomości
     decoded_message = receive_huffman_encoded_message(address, port, huffman_dict)
-    print("Odebrana wiadomość: ", decoded_message)
+
     # utworzenie nowego okna
     new_window = tk.Toplevel(root)
     new_window.geometry("300x100")
@@ -152,8 +163,8 @@ def sendMessage():
     encoded_message = "".join(huffman_dict[char] for char in text)
 
     # wysłanie zakodowanej wiadomości
-    host = "10.77.14.30"
-    port = 16500
+    host = "192.168.141.11"
+    port = 16049
     send_huffman_dict(huffman_dict, host, port)
     send_huffman_encoded_message(json.dumps(encoded_message), host, port)
     messagebox.showinfo("Wysłano wiadomość", "Pomyślnie wysłano wiadomość.")
@@ -168,7 +179,6 @@ def receiveMessage():
         with open(filename, "w") as file:
             file.write(decoded_message)
             file.close()
-            print("Zapisano plik pod nazwą: ", filename)
     except FileNotFoundError:
         messagebox.showinfo("Error", "Nie podano nazwy")
     messagebox.showinfo("Odebrano wiadomość", "Pomyślnie odebrano wiadomość.")
