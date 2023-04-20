@@ -69,14 +69,11 @@ def receive_huffman_dict(address, port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((address, port))
         s.listen()
-        print("1")
         conn, addr = s.accept()
         with conn:
-            print("2")
             print('Connected by', addr)
             data = conn.recv(1024)
             if data:
-                print("3")
                 json_dict = data.decode()
                 huffman_dict = json.loads(json_dict)
                 return huffman_dict
@@ -143,7 +140,6 @@ def sendMessage():
 
     # odczytanie wiadomości z pliku
     filename = text_var2.get()
-    print(text_var2.get())
     try:
         with open(filename, "r") as file:
             text = file.read()
