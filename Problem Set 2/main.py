@@ -5,22 +5,20 @@ import json
 import tkinter as tk
 from tkinter import messagebox
 
-
 def send_huffman_dict(huffman_dict, host, port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((host, port))
         json_dict = json.dumps(huffman_dict)
         s.sendall(json_dict.encode())
+
 def huffman_encoding(data):
     # zliczanie występowania każdego znaku w wiadomośći
     freq = defaultdict(int)
     for char in data:
         freq[char] += 1
-
     # tworzenie zbioru z każdym znakiem i jego częstością występowania
     heap = [[weight, [symbol, ""]] for symbol, weight in freq.items()]
     heapq.heapify(heap)
-
     # łączenie węzłów drzewa huffmana i tworzenie kodów dla znaków
     while len(heap) > 1:
         left = heapq.heappop(heap)
@@ -39,7 +37,6 @@ def send_huffman_encoded_message(encoded_message, host, port):
         s.connect((host, port))
         s.sendall(json.dumps(encoded_message).encode())
 
-
 def huffman_decoding(encoded_message, huffman_dict):
     decoded_message = ""
     code = ""
@@ -52,7 +49,6 @@ def huffman_decoding(encoded_message, huffman_dict):
                 break
     return decoded_message
 
-
 def receive_huffman_encoded_message(address, port, huffman_dict):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((address, port))
@@ -64,7 +60,7 @@ def receive_huffman_encoded_message(address, port, huffman_dict):
                 encoded_message = json.loads(data.decode())
                 try:
                     with open("zakodowane.txt", "w") as file:
-                        file.write(encoded_message)
+                        file.write(encoded_message[1:-1])
                         file.close()
                 except FileNotFoundError:
                     print("a")
@@ -84,15 +80,17 @@ def receive_huffman_dict(address, port):
                 return huffman_dict
 
 decoded_message = ''
+
 def receiveMessageWindow():
     global decoded_message
     # adres i port do nasłuchiwania
-    address = '192.168.141.125'
+    address = '192.168.100.4'
     port = 16049
 
     # odbieranie słownika huffmana
     huffman_dict = receive_huffman_dict(address, port)
     abc = huffman_dict
+    print(abc)
     try:
         with open("słownik", "w") as file:
             file.write(json.dumps(abc))
@@ -118,7 +116,6 @@ def receiveMessageWindow():
     # przycisk w nowym oknie
     new_button = tk.Button(new_window, text="Zapisz odebrany plik", font=("Arial", 8) ,command=receiveMessage)
     new_button.pack(pady=5)
-
 
 def sendMessageWindow():
 
@@ -163,7 +160,7 @@ def sendMessage():
     encoded_message = "".join(huffman_dict[char] for char in text)
 
     # wysłanie zakodowanej wiadomości
-    host = "192.168.141.11"
+    host = "192.168.100.4"
     port = 16049
     send_huffman_dict(huffman_dict, host, port)
     send_huffman_encoded_message(json.dumps(encoded_message), host, port)
